@@ -13,14 +13,10 @@ let goldLineSpikes = 16; // 金线的角的个数，默认16
 let isMoving = false; // 用于控制图形的移动
 
 function setup() {
-    createCanvas(windowWidth, windowHeight); // 创建根据窗口大小调整画布
-    noLoop(); // 停止draw函数连续执行，画面静止
-    noStroke(); // 画圆时不显示边框
-    initializeCircles(); // 初始化所有圆形
-  }
-  function initializeCircles() {
-    circles = []; // 清空所有圆形
-  
+  createCanvas(windowWidth, windowHeight); // 创建根据窗口大小调整画布
+  noLoop(); // 停止draw函数连续执行，画面静止
+  noStroke(); // 画圆时不显示边框
+
   // 初始化所有圆的信息，并加入到circles数组中
   let y = circleDiameter / 2;
   while (y < height + circleDiameter) {
@@ -319,27 +315,14 @@ function generateColors() {
     color(random(255), random(255), random(255))
   ];
 }
-//0\1\2
+
 function keyPressed() {
-    if (key === '1') {
-      isMoving = !isMoving; // 切换移动状态
-      if (isMoving) {
-        loop(); // 开始动画循环
-      } else {
-        noLoop(); // 停止动画循环
-      }
-    } else if (key === '2') {
-      // 从初始位置开始滚动
-      for (let i = 0; i < circles.length; i++) {
-        circles[i].vx = 2; // 设置初始速度以向右移动图形
-      }
-      isMoving = true; // 启用移动
-      loop(); // 开始动画循环
-    } else if (key === '0') {
-      background(50, 100, 150); // 清除画布
-      initializeCircles(); // 重新初始化所有圆形
-      redraw(); // 重新绘制画布
-      noLoop(); // 停止动画循环
-      isMoving = false; // 禁用移动
+  if (key === '1') {
+    isMoving = !isMoving; // 切换移动状态
+    if (isMoving) {
+      loop(); // 开始循环
+    } else {
+      noLoop(); // 停止循环
     }
   }
+}
