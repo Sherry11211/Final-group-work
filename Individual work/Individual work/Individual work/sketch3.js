@@ -13,10 +13,14 @@ let goldLineSpikes = 16; // 金线的角的个数，默认16
 let isMoving = false; // 用于控制图形的移动
 
 function setup() {
-  createCanvas(windowWidth, windowHeight); // 创建根据窗口大小调整画布
-  noLoop(); // 停止draw函数连续执行，画面静止
-  noStroke(); // 画圆时不显示边框
-
+    createCanvas(windowWidth, windowHeight); // 创建根据窗口大小调整画布
+    noLoop(); // 停止draw函数连续执行，画面静止
+    noStroke(); // 画圆时不显示边框
+    initializeCircles(); // 初始化所有圆形
+  }
+  function initializeCircles() {
+    circles = []; // 清空所有圆形
+  
   // 初始化所有圆的信息，并加入到circles数组中
   let y = circleDiameter / 2;
   while (y < height + circleDiameter) {
@@ -57,57 +61,67 @@ function setup() {
 }
 
 function draw() {
-  background(50, 100, 150); // 设置背景颜色
-
-  // 更新圆的位置并处理碰撞
-  if (isMoving) {
+    background(50, 100, 150); // 设置背景颜色
+  
+    // 更新圆的位置并处理碰撞
+    if (isMoving) {
+      for (let i = 0; i < circles.length; i++) {
+        let c = circles[i];
+        c.x += c.vx;
+        c.y += c.vy;
+  
+        // 碰撞检测并反弹
+        if (c.x < c.d / 2 || c.x > width - c.d / 2) {
+          c.vx *= -1;
+        }
+        if (c.y < c.d / 2 || c.y > height - c.d / 2) {
+          c.vy *= -1;
+        }
+      }
+    } else {
+      // 在按下 "4" 键时，让圆向鼠标位置聚集
+      for (let i = 0; i < circles.length; i++) {
+        let c = circles[i];
+        // 计算角度以指向鼠标位置
+        let angle = atan2(mouseY - c.y, mouseX - c.x);
+        // 设置 x 和 y 方向速度以朝向鼠标位置
+        c.vx = cos(angle) * 2;
+        c.vy = sin(angle) * 2;
+      }
+    }
+  
+    // 绘制所有圆和其他图形
     for (let i = 0; i < circles.length; i++) {
       let c = circles[i];
-      c.x += c.vx;
-      c.y += c.vy;
-
-      // 碰撞检测并反弹
-      if (c.x < c.d / 2 || c.x > width - c.d / 2) {
-        c.vx *= -1;
-      }
-      if (c.y < c.d / 2 || c.y > height - c.d / 2) {
-        c.vy *= -1;
+      let radii = [c.d, c.d * 0.55, c.d * 0.5, c.d * 0.25, c.d * 0.15, c.d * 0.1, c.d * 0.05]; // 主圆及内部圆的大小
+  
+      if (c.isSpecial) {
+        drawSpecialCirclePattern(c.x, c.y, radii, c.colors, c.styleType);
+      } else {
+        drawCirclePattern(c.x, c.y, radii, c.colors, c.styleType);
       }
     }
-  }
-
-  // 绘制所有圆和其他图形
-  for (let i = 0; i < circles.length; i++) {
-    let c = circles[i];
-    let radii = [c.d, c.d * 0.55, c.d * 0.5, c.d * 0.25, c.d * 0.15, c.d * 0.1, c.d * 0.05]; // 主圆及内部圆的大小
-
-    if (c.isSpecial) {
-      drawSpecialCirclePattern(c.x, c.y, radii, c.colors, c.styleType);
-    } else {
-      drawCirclePattern(c.x, c.y, radii, c.colors, c.styleType);
+  
+    // 绘制橘色圆环
+    drawOrangeCircles(circles);
+  
+    // 在橘色圆环上绘制图案
+    for (let i = 0; i < circles.length; i++) {
+      let c = circles[i];
+      drawPatternOnRing(c.x, c.y, c.d / 2 + 15);
     }
-  }
-
-  // 绘制橘色圆环
-  drawOrangeCircles(circles);
-
-  // 在橘色圆环上绘制图案
-  for (let i = 0; i < circles.length; i++) {
-    let c = circles[i];
-    drawPatternOnRing(c.x, c.y, c.d / 2 + 15);
-  }
-
-  // 最后绘制粉色弧线，确保它们在最顶层
-  for (let i = 0; i < circles.length; i++) {
-    let c = circles[i];
-    if (c.hasArc) {  // 检查是否需要绘制弧线
-      drawArcThroughCenter(c.x, c.y, c.d / 2, c.startAngle);
+  
+    // 最后绘制粉色弧线，确保它们在最顶层
+    for (let i = 0; i < circles.length; i++) {
+      let c = circles[i];
+      if (c.hasArc) {  // 检查是否需要绘制弧线
+        drawArcThroughCenter(c.x, c.y, c.d / 2, c.startAngle);
+      }
     }
+  
+    // 在两组特殊的同心圆中分别绘制红线
+    drawRedLinesInSpecialCircles();
   }
-
-  // 在两组特殊的同心圆中分别绘制红线
-  drawRedLinesInSpecialCircles();
-}
 
 function drawCirclePattern(x, y, radii, colors, styleType) {
   let numRings = radii.length; // 同心圆的数量
@@ -254,29 +268,35 @@ function drawOrangeCircles(circles) {
 }
 
 function drawPatternOnRing(cx, cy, radius) {
-  push();
-  noFill();
-  stroke(255, 192, 203); // 粉色
-  strokeWeight(2);
+    let numPatterns = 8; // 图案的数量，减少密集度
+    let angleStep = TWO_PI / numPatterns; // 每个图案之间的角度
   
-  let numSegments = 12; // 图案的分段数
-  let angleStep = TWO_PI / numSegments; // 每段的角度
-
-  for (let i = 0; i < numSegments; i++) {
-    let angle1 = i * angleStep;
-    let angle2 = (i + 1) * angleStep;
-
-    let x1 = cx + cos(angle1) * radius;
-    let y1 = cy + sin(angle1) * radius;
-    let x2 = cx + cos(angle2) * radius;
-    let y2 = cy + sin(angle2) * radius;
-
-    line(x1, y1, cx, cy); // 从圆环上的点画线到圆心
-    line(x1, y1, x2, y2); // 在圆环上画线段
+    push(); // 保存绘图设置
+  
+    for (let i = 0; i < numPatterns; i++) {
+      let angle = i * angleStep;
+      let x = cx + cos(angle) * radius;
+      let y = cy + sin(angle) * radius;
+  
+      // 绘制黄色圆
+      let angleOffset = angleStep / 3;
+      let xOffset = cx + cos(angle + angleOffset) * radius;
+      let yOffset = cy + sin(angle + angleOffset) * radius;
+      fill(255, 255, 0);
+      ellipse(xOffset, yOffset, 6, 6);
+  
+      // 绘制黑色圆环
+      let angleOffset2 = angleStep / 3 * 2;
+      let xOffset2 = cx + cos(angle + angleOffset2) * radius;
+      let yOffset2 = cy + sin(angle + angleOffset2) * radius;
+      fill(0);
+      ellipse(xOffset2, yOffset2, 21, 21);
+      fill(255);
+      ellipse(xOffset2, yOffset2, 7, 7);
+    }
+  
+    pop(); // 恢复绘图设置
   }
-
-  pop();
-}
 
 function drawArcThroughCenter(cx, cy, radius, startAngle) {
   push();
@@ -315,14 +335,54 @@ function generateColors() {
     color(random(255), random(255), random(255))
   ];
 }
-
+//0\1\2
 function keyPressed() {
-  if (key === '1') {
-    isMoving = !isMoving; // 切换移动状态
-    if (isMoving) {
-      loop(); // 开始循环
-    } else {
-      noLoop(); // 停止循环
+    if (key === '1') {
+      // 移动/停止移动图形
+      isMoving = !isMoving;
+      if (isMoving) {
+        loop(); // 开始动画循环
+      } else {
+        noLoop(); // 停止动画循环
+      }
+    } else if (key === '2') {
+      // 从初始位置开始向右滚动
+      for (let i = 0; i < circles.length; i++) {
+        circles[i].vx = 5.5; // 设置速度向右移动
+      }
+      isMoving = true; // 启用移动
+      loop(); // 开始动画循环
+    } else if (key === '0') {
+      // 清除画布并重新初始化圆形
+      background(50, 100, 150); // 清除画布
+      initializeCircles(); // 重新初始化所有圆形
+      redraw(); // 重新绘制画布
+      noLoop(); // 停止动画循环
+      isMoving = false; // 禁用移动
+    } else if (key === '3') {
+      // 从初始位置开始向左滚动
+      for (let i = 0; i < circles.length; i++) {
+        circles[i].vx = -10; // 设置速度向左移动
+      }
+      isMoving = true; // 启用移动
+      loop(); // 开始动画循环
+    } else if (key === '4') {
+      // 将所有圆形朝向鼠标位置移动
+      for (let i = 0; i < circles.length; i++) {
+        let c = circles[i];
+        let angle = atan2(mouseY - c.y, mouseX - c.x); // 计算角度以指向鼠标位置
+        c.vx = cos(angle) * 10; // 设置 x 方向速度以朝向鼠标位置
+        c.vy = sin(angle) * 10; // 设置 y 方向速度以朝向鼠标位置
+      }
+      isMoving = true; // 启用移动
+      loop(); // 开始动画循环
+    } else if (key === '5') {
+      // 按下 "5" 键时，使圆形随机变化大小
+      for (let i = 0; i < circles.length; i++) {
+        let c = circles[i];
+        // 生成随机的半径值，范围在4到25之间
+        c.d = random(3, 27) * 10;
+      }
+      redraw(); // 重新绘制画布，以更新圆形大小
     }
   }
-}
