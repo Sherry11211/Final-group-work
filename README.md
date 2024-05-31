@@ -121,8 +121,9 @@ If the distance is less than the radius of the circle (the click is inside the c
 - Added two functions to update the position of each circle for collision detection and bounce handling.
 
 ##### Modified function drawRedLine and function drawGoldZShape
-- Delete let innerAngle = angle + angleStep / 2;
-    let innerRadiusAdjust = fourthRadius + (thirdRadius - fourthRadius) * 0.3; If don't delete it, the animation display will be problematic
+- Delete “let innerAngle = angle + angleStep / 2;”
+“let innerRadiusAdjust = fourthRadius + (thirdRadius - fourthRadius) * 0.3;”
+If don't delete it, the animation display will be problematic
 
 ##### Modified function fillDotsOnCircle function
 - The modified dots are randomly distributed so that the dots can move randomly when the “1,2,3,4” button is clicked to execute the motion trajectory.
@@ -130,3 +131,7 @@ If the distance is less than the radius of the circle (the click is inside the c
 ##### Mouse clicked & Mouse released
 - The final update assigns the 'Mouse clicked, Mouse released' operations to a 'class'. 
 - I also inserted a mouse click event in the 'function setup' to ensure that the function is executed correctly.
+
+#### WindowResized
+- Finally added the ability to adapt the prototype to the window interface
+- First, resize the canvas, then initialize the circle, and finally draw it.
