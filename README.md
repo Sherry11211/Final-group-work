@@ -21,7 +21,8 @@ My Creative coding major project for IDEA9103
 
 
 **4.Click on the number “4” on the keyboard, the pattern in the screen will be gathered to the mouse position, and after gathering, it will be dispersed and move freely.**
-
+- Each press of ‘4’ will update the mouse position and the concentric circles will move towards the updated mouse position. Try pressing ‘4’ more than once.
+- When using the ‘1,2,3,5’ function, you can also press ‘4’ and the concentric circles will move towards the mouse position.
 *Click “1” again to pause the track movement.*
 *At this point, the mouse clicks on which circle is selected will move with the mouse. Clicking the circle again will uncheck it.*
 
@@ -41,6 +42,7 @@ My Creative coding major project for IDEA9103
 *Notes：*
 - *After clicking “1, 2, 3, 4” dynamic operation, and then click “1” the screen will be in a static state, at this time again click “1” to restore the dynamic.*
 - *When running the “1,2,3” operation, some circles may be stuck at the edge of the canvas, just drag them to the center with the mouse and they will not be stuck anymore.*
+- *Each function key can be used crosswise for unexpected effects, and it's fun to use them individually.*
 
 ## Details of your individual approach to animating the group code.
 ###  Interaction
