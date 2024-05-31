@@ -3,6 +3,9 @@ My Creative coding major project for IDEA9103
 ## Instructions on how to interact with the work
 
 **1.Click the number “1” on the keyboard and the pattern on the screen will move in a randomized trajectory.**
+- You cannot use '2,3,4' before using the '1' function since it will become a static effect after applying other dynamic functions.
+- Recommended order ‘0/5~1~Other’ or ‘1~Other’.
+- It is preferable to use '1' before '2, 3, 5', and there is no order constraint on '0, 5' in the stationary state.
 
 *Click “1” again to pause the track movement.*
 *At this point, the mouse clicks on which circle is selected will move with the mouse. Clicking the circle again will uncheck it.*
@@ -86,17 +89,30 @@ My Creative coding major project for IDEA9103
 ### Technical explanation
 #### Added keyboard interactions with keys (1, 2, 3, 4, 5, 0) to achieve different interactions such as stop/start movement, scroll right/left, re-initialize circle, move towards mouse position and randomly change circle size.
 function keyPressed() { ... }
+- "1":If the value of 'isMoving' is 'true', this variable is used to control the graph's moving state; otherwise, it is 'false'. ' had a value of "false", it becomes "true". This variable is used to regulate the graphic's movement, either starting or stopping.
+
+- "2":Use the ‘for’ loop to give each circle a speed of 5.5 to the right horizontally, and then control the movement of the graphic by ‘isMoving’, and finally run the function.
+
+- "0":Reinitialize the circle array, then apply the 'draw' method again to draw the circle, then stop the graphic movement using 'no loop & is Moving'.
+
+- "3":Use the 'for' loop to give the circle a horizontal speed of 10 to the left, then control the graphic's movement using 'isMoving', and finally start the animation.
+
+- "4": Determine each circle with 'for', then use 'atan2' to compute the angle between the target circle c and the mouse point. The obtained angle is then used to apply a horizontal velocity of 'x,y' to the target circle via the'sin.cos' function. Finally, apply the function to start the animation.
+
+-"5":The ‘for’ loop is used to determine each circle, then the function randomly generates the diameter of the circle, and finally redraws the circle.
+
+*You can customize the circle size and speed values.*
 
 #### Added mouse click, mouse release drag and drop functionality.
 ##### function mouseClicked() {...}
 -Check if concentric circles have been selected
 If selectedCircleIndex is not equal to -1, it means that a circle is already selected.
 Calculates the distance d from the mouse to the center of the circle.
-If the distance is less than the circle radius (i.e., the click is inside the circle), deselect and turn off the drag function.
+If the distance is less than the circle radius (the click is inside the circle), deselect and turn off the drag function.
 
 - Check if another concentric circle is clicked
 Calculate the distance d
-If the distance is less than the radius of the circle (i.e., the click is inside the circle), then check to enable dragging
+If the distance is less than the radius of the circle (the click is inside the circle), then check to enable dragging
 
 ##### function mouseReleased() {...}
 - Stop dragging when the mouse is released.
@@ -111,3 +127,6 @@ If the distance is less than the radius of the circle (i.e., the click is inside
 ##### Modified function fillDotsOnCircle function
 - The modified dots are randomly distributed so that the dots can move randomly when the “1,2,3,4” button is clicked to execute the motion trajectory.
 
+##### Mouse clicked & Mouse released
+- The final update assigns the 'Mouse clicked, Mouse released' operations to a 'class'. 
+- I also inserted a mouse click event in the 'function setup' to ensure that the function is executed correctly.

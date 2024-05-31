@@ -17,34 +17,38 @@ let isDragging = false; // Track mouse drag state
 function setup() {
     createCanvas(windowWidth, windowHeight); // Creating a window-sized canvas
     noLoop(); // Stop the continuous execution of the draw function, the screen is still
-    noStroke(); //
-    initializeCircles(); //
+    noStroke(); 
+    initializeCircles();
+     // Register mouse event handlers
+     mouseClicked = MouseInteractions.mouseClicked;
+     mouseReleased = MouseInteractions.mouseReleased;
   }
   function initializeCircles() {
     circles = []; //Clear all circles
   
   // Add to circles array
-  let y = circleDiameter / 2;
-  while (y < height + circleDiameter) {
-    let x = circleDiameter / 2;
+  let y = circleDiameter / 2;//Check if the click is on another circle drawn from the center of the original circle, with an initial y-coordinate of the circle's radius
+  while (y < height + circleDiameter) {//Continue sketching when the y-coordinate is smaller than the height of the canvas and the diameter of the circle.
+    let x = circleDiameter / 2;//The initial x-coordinate is the circle's radius.
     while (x < width + circleDiameter) {
-      let angle = random(TWO_PI);  
-      let hasArc = random() > 0.5;  
+      let angle = random(TWO_PI);  //Random angle（0~2*PI）
+      let hasArc = random() > 0.5;  //Randomly decide whether the circle has an arc with a probability of 50%
       let styleType = random(['goldZigzag', 'multiLayeredRings']); // Randomize style selection
       circles.push({
-        x: x + offsetX,
+        x: x + offsetX,//Circle position + offsetx
         y: y + offsetY,
         d: circleDiameter,
         colors: generateColors(),
-        startAngle: angle,
-        hasArc: hasArc,
+        startAngle: angle,//Circle start angle
+        hasArc: hasArc,//Whether has arc
         styleType: styleType,  
-        vx: random(-2, 2), // Random x-direction velocity
+        vx: random(-2, 2), // Random x-direction velocity(-2,2)
         vy: random(-2, 2)  
       });
-      x += circleDiameter + spacing;
+      x += circleDiameter + spacing;//Move the x-coordinate to make space for the following circle.
+
     }
-    y += circleDiameter + spacing;
+    y += circleDiameter + spacing;//y(Same as above)
   }
 
   // Randomly select two concentric circle groups
@@ -62,32 +66,34 @@ function setup() {
   }
 }
 
-function mouseClicked() {
-  if (selectedCircleIndex !== -1) {
-      // If a circle is already selected, check whether to click on it again
-      let c = circles[selectedCircleIndex];
-      let d = dist(mouseX, mouseY, c.x, c.y);
-      if (d < c.d / 2) {
-          selectedCircleIndex = -1; // Uncheck
-          isDragging = false; // Disable mouse dragging
-          return; 
-      }
-  }
+class MouseInteractions {
+    static mouseClicked() {
+        if (selectedCircleIndex !== -1) {
+            // If a circle has already been selected, check whether to click on it again
+            let c = circles[selectedCircleIndex];
+            let d = dist(mouseX, mouseY, c.x, c.y);
+            if (d < c.d / 2) {
+                selectedCircleIndex = -1; // stop choosing
+                isDragging = false; // Disable mouse dragging
+                return;
+            }
+        }
 
-  // Check if the click is on another circle
-  for (let i = 0; i < circles.length; i++) {
-      let c = circles[i];
-      let d = dist(mouseX, mouseY, c.x, c.y);
-      if (d < c.d / 2) { // f the click is within a circle
-          selectedCircleIndex = i; //selected
-          isDragging = true; // dragging
-          break; 
-      }
-  }
-}
+        // Check if the click is on another circle
+        for (let i = 0; i < circles.length; i++) {
+            let c = circles[i];
+            let d = dist(mouseX, mouseY, c.x, c.y);
+            if (d < c.d / 2) {
+                selectedCircleIndex = i; // selected
+                isDragging = true; // dragging
+                break;
+            }
+        }
+    }
 
-function mouseReleased() {
-    isDragging = false; // stop dragging
+    static mouseReleased() {
+        isDragging = false; // stop dragging
+    }
 }
 
   function draw() {
@@ -429,8 +435,8 @@ function keyPressed() {
       for (let i = 0; i < circles.length; i++) {
         let c = circles[i];
         let angle = atan2(mouseY - c.y, mouseX - c.x); // Calculate the angle pointing to the mouse
-        c.vx = cos(angle) * 10; // Set the x position toward the mouse
-        c.vy = sin(angle) * 10; // Set the y position toward the mouse
+        c.vx = cos(angle) * 8; // Set the x position toward the mouse
+        c.vy = sin(angle) * 8; // Set the y position toward the mouse
       }
       isMoving = true; 
       loop(); 
@@ -446,8 +452,7 @@ function keyPressed() {
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  circles = [];
-  setup(); // Regenerate circles
-  redraw();
+    resizeCanvas(windowWidth, windowHeight); // Resize canvas to window size    
+    initializeCircles();// Regenerate and draw the circle
+    redraw(); // Redrawing the canvas
 }
