@@ -2,7 +2,7 @@ let circles = [];
 let circleDiameter = 180; 
 let spacing = 35; 
 let offsetX = -10; 
-let offsetY = -20; 
+let offsetY = -20;
 
 let specialCircleColor = [255, 255, 0]; // yellow
 let redLineStrokeWeight = 0.8; 
@@ -10,20 +10,24 @@ let redLineSpikes = 130;
 let goldLineStrokeWeight = 3; 
 let goldLineSpikes = 16; 
 
-let isMoving = false; //Used to control the movement of graphics
+let isMoving = false; // Used to control the movement of graphics
 
 function setup() {
-  createCanvas(windowWidth, windowHeight); // Creating a canvas that resizes to the window
-  noLoop(); 
-  noStroke(); 
-
+    createCanvas(windowWidth, windowHeight); 
+    noLoop(); 
+    noStroke(); 
+    initializeCircles(); // Initialise all circles
+  }
+  function initializeCircles() {
+    circles = []; //  Clear all circles
+  
   // Initialise information about all circles and add to the circles array
   let y = circleDiameter / 2;
   while (y < height + circleDiameter) {
     let x = circleDiameter / 2;
     while (x < width + circleDiameter) {
       let angle = random(TWO_PI);  // Random start angle
-      let hasArc = random() > 0.5;  //50% chance of an arc.
+      let hasArc = random() > 0.5;  // 50% chance of having an arc.
       let styleType = random(['goldZigzag', 'multiLayeredRings']); 
       circles.push({
         x: x + offsetX,
@@ -34,7 +38,7 @@ function setup() {
         hasArc: hasArc,
         styleType: styleType,  
         vx: random(-2, 2), // Random x-direction velocity
-        vy: random(-2, 2)  //y
+        vy: random(-2, 2)  // y
       });
       x += circleDiameter + spacing;
     }
@@ -59,14 +63,14 @@ function setup() {
 function draw() {
   background(50, 100, 150); 
 
-  //Update the position of the circle and handle collisions
+  // Update the position of the circle and handle collisions
   if (isMoving) {
     for (let i = 0; i < circles.length; i++) {
       let c = circles[i];
       c.x += c.vx;
       c.y += c.vy;
 
-      //Collision detection and rebound
+      // Collision detection and rebound
       if (c.x < c.d / 2 || c.x > width - c.d / 2) {
         c.vx *= -1;
       }
@@ -88,16 +92,16 @@ function draw() {
     }
   }
 
-  // Drawing an orange circle
+  //orange rings
   drawOrangeCircles(circles);
 
-  // Drawing patterns on orange circles
+  // 在橘色圆环上绘制图案
   for (let i = 0; i < circles.length; i++) {
     let c = circles[i];
     drawPatternOnRing(c.x, c.y, c.d / 2 + 15);
   }
 
-  // Finally draw the pink arcs, making sure they are at the very top
+  // Drawing a pattern on orange circles
   for (let i = 0; i < circles.length; i++) {
     let c = circles[i];
     if (c.hasArc) {  // Check if arcs need to be drawn
@@ -110,12 +114,12 @@ function draw() {
 }
 
 function drawCirclePattern(x, y, radii, colors, styleType) {
-  let numRings = radii.length; // Number of concentric circles
+  let numRings = radii.length;
   for (let i = 0; i < numRings; i++) {
     fill(colors[i % colors.length]); 
-    ellipse(x, y, radii[i], radii[i]);
-    if (i == 0) { 
-      fillDotsOnCircle(x, y, radii[0] / 2, radii[1] / 2); // Fill dots to entire circle
+    ellipse(x, y, radii[i], radii[i]); 
+    if (i == 0) { // Draw white dots only between the largest circle and the second largest circle
+      fillDotsOnCircle(x, y, radii[0] / 2, radii[1] / 2); // Fill dots to the whole circle
     }
     if (i == 2 && i + 1 < numRings) { // Drawing between the third and fourth largest circles according to style
       if (styleType === 'goldZigzag') {
@@ -161,7 +165,7 @@ function drawRedLine(cx, cy, outerRadius, innerRadius) {
   strokeWeight(redLineStrokeWeight); 
   noFill(); 
 
-  let numSpikes = redLineSpikes;  
+  let numSpikes = redLineSpikes; 
   let angleStep = TWO_PI / numSpikes; 
 
   beginShape();
@@ -170,7 +174,7 @@ function drawRedLine(cx, cy, outerRadius, innerRadius) {
     let angle = i * angleStep;
     let outerX = cx + cos(angle) * outerRadius;
     let outerY = cy + sin(angle) * outerRadius;
-    vertex(outerX, outerY); 
+    vertex(outerX, outerY); // Adding Outer Circle Points
 
     // Calculate the position of the inner circle point (shrink it inwards a bit)
     let innerX = cx + cos(angle + angleStep / 2) * innerRadius;
@@ -184,12 +188,12 @@ function drawRedLine(cx, cy, outerRadius, innerRadius) {
 
 function drawGoldZShape(cx, cy, outerRadius, innerRadius) {
   push();
-  stroke(255, 215, 0); // glden
-  strokeWeight(goldLineStrokeWeight);
+  stroke(255, 215, 0); //golden
+  strokeWeight(goldLineStrokeWeight); 
   noFill(); 
 
-  let numSpikes = goldLineSpikes; // Number of sharp corners
-  let angleStep = TWO_PI / numSpikes; // angle
+  let numSpikes = goldLineSpikes; 
+  let angleStep = TWO_PI / numSpikes; 
 
   beginShape();
   for (let i = 0; i < numSpikes; i++) {
@@ -197,9 +201,9 @@ function drawGoldZShape(cx, cy, outerRadius, innerRadius) {
     let angle = i * angleStep;
     let outerX = cx + cos(angle) * outerRadius;
     let outerY = cy + sin(angle) * outerRadius;
-    vertex(outerX, outerY); 
+    vertex(outerX, outerY); // Adding Outer Circle Points
 
-    // Calculate the position of the inner circle point (shrink it inwards a bit)
+    //Calculate the position of the inner circle point (shrink it inwards a bit)
     let innerX = cx + cos(angle + angleStep / 2) * innerRadius;
     let innerY = cy + sin(angle + angleStep / 2) * innerRadius;
     vertex(innerX, innerY); 
@@ -211,12 +215,12 @@ function drawGoldZShape(cx, cy, outerRadius, innerRadius) {
 
 function drawMultiLayeredRings(cx, cy, outerRadius, innerRadius) {
   push();
-  stroke(255); 
+  stroke(255); // white
   strokeWeight(0.5); 
-  noFill(); 
+  noFill();
 
-  let numRings = 5;
-  let ringStep = (outerRadius - innerRadius) / numRings; 
+  let numRings = 5; 
+  let ringStep = (outerRadius - innerRadius) / numRings; // Radius difference between each level
 
   for (let i = 0; i <= numRings; i++) {
     let radius = outerRadius - i * ringStep;
@@ -228,16 +232,16 @@ function drawMultiLayeredRings(cx, cy, outerRadius, innerRadius) {
 
 function drawGreenLayeredRings(cx, cy, outerRadius, innerRadius) {
   push();
-  stroke(0, 255, 0);
+  stroke(0, 255, 0); // green
   strokeWeight(0.5); 
-  noFill();
+  noFill(); 
 
   let numRings = 3; 
-  let ringStep = (outerRadius - innerRadius) / numRings; //Radius difference between each layer
+  let ringStep = (outerRadius - innerRadius) / numRings; 
 
   for (let i = 0; i <= numRings; i++) {
     let radius = outerRadius - i * ringStep;
-    ellipse(cx, cy, radius * 2, radius * 2); // rings
+    ellipse(cx, cy, radius * 2, radius * 2);
   }
 
   pop();
@@ -249,7 +253,7 @@ function drawOrangeCircles(circles) {
     stroke(255, 165, 0); // orange
     strokeWeight(3);
     noFill();
-    ellipse(c.x, c.y, c.d + 30, c.d + 30); 
+    ellipse(c.x, c.y, c.d + 30, c.d + 30); // Drawing an orange circle outside an existing circle
   }
 }
 
@@ -272,7 +276,7 @@ function drawPatternOnRing(cx, cy, radius) {
     let y2 = cy + sin(angle2) * radius;
 
     line(x1, y1, cx, cy); // Draw a line from the point on the circle to the centre of the circle
-    line(x1, y1, x2, y2); // Draw line segments on the circle
+    line(x1, y1, x2, y2); // Drawing line segments on a circle
   }
 
   pop();
@@ -284,7 +288,7 @@ function drawArcThroughCenter(cx, cy, radius, startAngle) {
   strokeWeight(3);
   noFill();
 
-  let arcAngle = PI / 4; // Angle range of arcs
+  let arcAngle = PI / 4; // Angular range of arcs
   let endAngle = startAngle + arcAngle;
 
   arc(cx, cy, radius * 2, radius * 2, startAngle, endAngle);
@@ -292,7 +296,6 @@ function drawArcThroughCenter(cx, cy, radius, startAngle) {
   pop();
 }
 
-//random dots
 function fillDotsOnCircle(cx, cy, outerRadius, innerRadius) {
   let numDots = 30; 
   let angleStep = TWO_PI / numDots; 
@@ -302,13 +305,13 @@ function fillDotsOnCircle(cx, cy, outerRadius, innerRadius) {
     let radius = random(innerRadius, outerRadius); 
     let x = cx + cos(angle) * radius;
     let y = cy + sin(angle) * radius;
-    fill(255); 
+    fill(255); // white dots
     ellipse(x, y, 5, 5); 
   }
 }
 
 function generateColors() {
-  
+  // Returns a set of colours for drawing concentric circles.
   return [
     color(random(255), random(255), random(255)),
     color(random(255), random(255), random(255)),
@@ -316,21 +319,35 @@ function generateColors() {
     color(random(255), random(255), random(255))
   ];
 }
-
+//1/2/0/3
 function keyPressed() {
     if (key === '1') {
-      isMoving = !isMoving; // Toggle movement
+      isMoving = !isMoving; // Toggle mobile state
       if (isMoving) {
-        loop(); // Start animation loop
+        loop(); // start
       } else {
-        noLoop(); // Stop animation loop
+        noLoop(); // stop
       }
     } else if (key === '2') {
-      // Start scrolling from initial positions
+      // Scroll from initial position
       for (let i = 0; i < circles.length; i++) {
-        circles[i].vx = 2; // Set initial velocity to move shapes to the right
+        circles[i].vx = 3; // Set the initial speed to move the graph to the right
       }
-      isMoving = true; // Enable movement
-      loop(); // Start animation loop
+      isMoving = true;
+      loop();
+    } else if (key === '0') {
+      background(50, 100, 150); // Clearing the canvas
+      initializeCircles(); // Reinitialise all circles
+      redraw(); 
+      noLoop(); 
+      isMoving = false; // Disable Mobile
+    } else if (key === '3') {
+      // Press ‘3’ to scroll all circles to the left.
+      for (let i = 0; i < circles.length; i++) {
+        circles[i].vx = -4; //Scroll left
+      }
+      isMoving = true; 
+      loop(); 
     }
   }
+  
